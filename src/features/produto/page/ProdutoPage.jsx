@@ -4,11 +4,10 @@ import CrudActions from "../../../shared/components/CrudActions";
 import Footer from "../../../shared/components/Footer";
 import Menu from "../../../shared/components/Menu";
 import NewButton from "../../../shared/components/NewButton";
-import { formatarData } from "../../../shared/util/dateUtils";
 import { listar } from "../../../shared/services/crudService";
-import { MAPPING_CONTROLLER_CLIENTE } from "../service/clienteService";
+import { MAPPING_CONTROLLER_PRODUTO } from "../service/produtoService";
 
-export default function ClientePage() {
+export default function ProdutoPage() {
 
    const [lista, setLista] = useState([]);
 
@@ -17,14 +16,14 @@ export default function ClientePage() {
    }, []);
 
    async function carregar() {
-       const data = await listar(MAPPING_CONTROLLER_CLIENTE);
+       const data = await listar(MAPPING_CONTROLLER_PRODUTO);
        setLista(data);
    }
 
    function editar(id) {}
 
    async function confirmarRemover(id) {
-       if (confirm("Deseja realmente excluir este cliente?")) {
+       if (confirm("Deseja realmente excluir este produto?")) {
            console.log(id);
        }
    }
@@ -33,7 +32,7 @@ export default function ClientePage() {
        <div>
            <Menu />
            <Breadcrumbs items={[
-               { label: "Cliente" },
+               { label: "Produto" },
                { label: "Listar" }
            ]} />
 
@@ -41,31 +40,36 @@ export default function ClientePage() {
 <div className="overflow-x-auto shadow-sm">
                    <div className="flex items-center justify-between mb-6" style={{marginTop: '20px', marginLeft: '10px', marginRight: '10px'}}>
                        <h1 className="text-3xl font-bold text-gray-800">
-                           Clientes
+                           Produtos
                        </h1>
-                       <NewButton destino="/cliente-form" />
+                       <NewButton destino="/produto-form" />
                    </div>
                    <div className="divider divider-info" />
                    <div className="overflow-x-auto" style={{marginTop: '30px'}}>
                        <table className="table table-zebra">
                            <thead>
                                <tr style={{textAlign: 'center'}}>
-                                   <th>Nome</th>
-                                   <th>CPF</th>
-                                   <th>Data de Nascimento</th>
+                                   <th>Código</th>
+                                   <th>Título</th>
+                                   <th>Descrição</th>
+                                   <th>Valor Unitário</th>
+                                   <th>Tempo de Entrega Mínimo</th>
+                                   <th>Tempo de Entrega Máximo</th>
                                    <th>Ações</th>
                                </tr>
                            </thead>
                            <tbody>
-                               {lista.map(cliente => (
-                                   <tr key={cliente.id}>
-                                       <td style={{width: '50%'}}>{cliente.nome}</td>
-                                       <td style={{textAlign: 'center'}}>{cliente.cpf}</td>
-                                       <td style={{textAlign: 'center'}}>{formatarData(cliente.dataNascimento)}</td>
+                               {lista.map(produto => (
+                                   <tr key={produto.id}>
+                                       <td style={{width: '50%'}}>{produto.codigo}</td>
+                                       <td style={{textAlign: 'center'}}>{produto.titulo}</td>
+                                       <td style={{ textAlign: 'center' }}>{produto.descricao}</td>
+                                       <td style={{ textAlign: 'center' }}>{produto.tempoEntregaMinimo}</td>
+                                       <td style={{ textAlign: 'center' }}>{produto.tempoEntregaMaximo}</td>
                                        <td style={{textAlign: 'center'}}>
                                            <CrudActions
-                                               onEdit={() => editar(cliente.id)}
-                                               onDelete={() => confirmarRemover(cliente.id)}
+                                               onEdit={() => editar(produto.id)}
+                                               onDelete={() => confirmarRemover(produto.id)}
                                            />
                                        </td>
                                    </tr>
