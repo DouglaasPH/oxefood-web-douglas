@@ -5,7 +5,8 @@ import Footer from "../../../shared/components/Footer";
 import Menu from "../../../shared/components/Menu";
 import NewButton from "../../../shared/components/NewButton";
 import { formatarData } from "../../../shared/util/dateUtils";
-import { listar } from "../../../shared/services/crudService";
+import { toast } from "react-toastify";
+import { buscarPorId, listar, remover } from "../../../shared/services/crudService";
 import { MAPPING_CONTROLLER_CLIENTE } from "../service/clienteService";
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +14,14 @@ export default function ClientePage() {
 
     const [lista, setLista] = useState([]);
     const navigate = useNavigate();
+    const [cliente, setCliente] = useState({
+        id: null,
+        nome: "",
+        cpf: "",
+        foneCelular: "",
+        foneFixo: "",
+        dataNascimento: ""
+    });
 
    useEffect(() => {
        carregar();
@@ -29,11 +38,46 @@ export default function ClientePage() {
 
    function editar(id) {}
 
-   async function confirmarRemover(id) {
-       if (confirm("Deseja realmente excluir este cliente?")) {
-           console.log(id);
-       }
-   }
+    async function confirmarRemover(id) {
+        if (!confirm("Deseja realmente excluir este cliente?")) {
+            return;
+        }
+
+        try {
+            await remover(MAPPING_CONTROLLER_CLIENTE, id);
+            await carregar();
+            toast.success("Cliente removido com sucesso!");
+
+        } catch (erro) {
+
+            console.error(erro);
+            toast.error("Erro ao tentar remover o cliente.");
+        }
+    }
+
+    async function detalhar(id) {
+        try {
+        
+            const data = await buscarPorId(
+                MAPPING_CONTROLLER_CLIENTE,
+                id
+            );
+
+            setCliente({
+                id: data.id,
+                nome: data.nome ?? "",
+                cpf: data.cpf ?? "",
+                foneCelular: data.foneCelular ?? "",
+                foneFixo: data.foneFixo ?? "",
+                dataNascimento: data.dataNascimento ?? ""
+            });
+
+            document.getElementById('modal-detalhar').showModal()
+
+        } catch (erro) {
+            toast.error("Erro ao carregar cliente.");
+        }
+    }
 
    return (
        <div>
@@ -70,6 +114,7 @@ export default function ClientePage() {
                                        <td style={{textAlign: 'center'}}>{formatarData(cliente.dataNascimento)}</td>
                                        <td style={{textAlign: 'center'}}>
                                            <CrudActions
+                                               onDetail={() => detalhar(cliente.id)}
                                                onEdit={() => editar(cliente.id)}
                                                onDelete={() => confirmarRemover(cliente.id)}
                                            />
@@ -81,6 +126,33 @@ export default function ClientePage() {
                    </div>
                </div>
            </div>
+           <dialog id="modal-detalhar" className="modal">
+                <div className="modal-box">   
+                    <h3 className="font-bold text-lg">Dados do Cliente</h3>
+                    <div className="divider" />
+                    <p className="py-4"> 
+                        <strong>Nome:</strong> {cliente.nome}
+                    </p>
+                    <p className="py-4">
+                        <strong>CPF:</strong> {cliente.cpf}
+                    </p>
+                    <p className="py-4">
+                        <strong>Data de Nascimento:</strong> {cliente.dataNascimento}
+                    </p>
+                    <p className="py-4">
+                        <strong>Fone Fixo:</strong> {cliente.foneFixo}
+                    </p>
+                    <p className="py-4">
+                        <strong>Fone Celular:</strong> {cliente.foneCelular}
+                    </p>
+                    <div className="modal-action">
+                        <form method="dialog">
+                            {/* if there is a button in form, it will close the modal */}
+                            <button className="btn">Fechar</button>
+                        </form>
+                    </div>
+                </div>
+            </dialog>
            <Footer />
        </div>
    );
