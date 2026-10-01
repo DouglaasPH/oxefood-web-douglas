@@ -20,7 +20,7 @@ export default function Router() {
            </Routes>
 
            <Routes>
-               <Route path="/cliente-form" element={<ClienteForm />} />
+               <Route path="/cliente-form/:idCliente?" element={<ClienteForm />} />
            </Routes>
 
            <Routes>
